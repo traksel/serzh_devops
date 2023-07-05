@@ -1,0 +1,53 @@
+---
+- hosts: servers
+  become: yes
+  tasks:
+    - name: Instal packages
+      apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: yes
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+        - python3-pip
+        - python3-setuptools
+
+
+    - name: add GPG key
+      apt_key:
+          url: https://download.docker.com/linux/ubuntu/gpg
+          state: present
+
+    - name: Add Docker repository
+      apt_repository:
+          repo: deb https://download.docker.com/linux/ubuntu focal stable
+          state: present 
+
+    - name: Install Docker
+      apt:
+          name: "{{ item }}"
+          state: latest
+          update_cache: yes
+      with_items:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+
+
+    - name: Install Docker Module for Python
+      pip:
+          name: docker
+
+    - name: Ensure group "docker" exists
+      ansible.builtin.group:
+          name: docker
+          state: present
+
+    - name: adding ubuntu to docker group
+      user:
+          name: ubuntu
+          groups: docker
+          append: yes

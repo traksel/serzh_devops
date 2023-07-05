@@ -1,0 +1,23 @@
+---
+- hosts: servers
+  become: yes
+  tasks:
+
+#  tasks:
+#    - name: create user
+#      user:
+#        name: user_nginx
+#        password: "{{ pwd | password_hash('sha512') }}"
+#      vars:
+#        pwd: "123456"
+
+    - name: Install Nginx Image
+      shell: docker pull nginx:latest
+
+    - name: Create container
+      docker_container:
+        name: my_nginx
+        image: nginx
+        auto_remove: yes
+        ports:
+          - "8080:80"
